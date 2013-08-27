@@ -1,6 +1,6 @@
 //
 //  NSObject+EasyCopy.m
-//  NSObject-EasyCopy
+//  AFNETTEST
 //
 //  Created by hesh on 13-8-26.
 //  Copyright (c) 2013年 ilikeido. All rights reserved.
@@ -20,12 +20,13 @@
             NSString *		propertyName = [NSString stringWithCString:name encoding:NSUTF8StringEncoding];
             SEL getSel= NSSelectorFromString(propertyName);
             if ([self respondsToSelector:getSel]) {
-                id tempValue = objc_msgSend(self, getSel);
+                id tempValue = [self valueForKey:propertyName];
                 NSString *topchar = [[propertyName substringToIndex:1]uppercaseString];
                 NSString *selectorString = [NSString stringWithFormat:@"set%@:",[propertyName stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:topchar]];
                 SEL setSel = NSSelectorFromString(selectorString);
                 if ([object respondsToSelector:setSel]) {
-                    objc_msgSend(object, setSel,tempValue);
+                    [object setValue:tempValue forKey:propertyName];
+//                    objc_msgSend(object, setSel,tempValue);
                 }
             }
         }
@@ -50,7 +51,7 @@
             NSString *		propertyName = [NSString stringWithCString:name encoding:NSUTF8StringEncoding];
             SEL getSel= NSSelectorFromString(propertyName);
             if ([self respondsToSelector:getSel]) {
-                id tempValue = objc_msgSend(self, getSel);
+                id tempValue = [self valueForKey:propertyName];
                 NSString *topchar = [[propertyName substringToIndex:1]uppercaseString];
                 NSString *selectorString = [NSString stringWithFormat:@"set%@:",[propertyName stringByReplacingCharactersInRange:NSMakeRange(0,1) withString:topchar]];
                 SEL setSel = NSSelectorFromString(selectorString);
@@ -60,14 +61,17 @@
                     if (flag) {
                         if ([(NSObject *)tempValue conformsToProtocol:@protocol(NSCopying) ]) {
                             NSObject *copyValue = [tempValue copy];
-                            objc_msgSend(object, setSel,copyValue);
+                            [object setValue:copyValue forKey:propertyName];
+//                            objc_msgSend(object, setSel,copyValue);
                         }else{
                             NSObject *copyValue = [[[tempValue class]alloc]init];
                             [tempValue easyDeepCopy:copyValue];
-                            objc_msgSend(object, setSel,copyValue);
+//                            objc_msgSend(object, setSel,copyValue);
+                            [object setValue:copyValue forKey:propertyName];
                         }
                     }else{
-                        objc_msgSend(object, setSel,tempValue);
+//                        objc_msgSend(object, setSel,tempValue);
+                        [object setValue:tempValue forKey:propertyName];
                     }
                     
                 }
